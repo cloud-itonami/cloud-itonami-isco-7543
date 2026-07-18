@@ -1,0 +1,11 @@
+[{:itonami.blueprint/social-impact [:product-safety :quality-assurance :consumer-protection]
+  :itonami.blueprint/domain :manufacturing/product-grading-testing-sample-intake-coordination
+  :itonami.blueprint/required-technologies [:robotics :identity :audit-ledger]
+  :itonami.blueprint/isco-08 "7543"
+  :itonami.blueprint/name "Product Graders and Testers (excluding Foods and Beverages) Sample-Intake Coordination Practice"
+  :itonami.blueprint/governor :prodgrade-governor
+  :itonami.blueprint/robotics true
+  :db/id -1
+  :itonami.blueprint/status :public-oss
+  :itonami.blueprint/id "cloud-itonami-isco-7543"
+  :itonami.blueprint/license "AGPL-3.0-or-later"}]

@@ -1,0 +1,85 @@
+(ns prodgrade.actor-test
+  (:require [clojure.test :refer [deftest is testing]]
+            [prodgrade.actor :as actor]
+            [prodgrade.store :as store]))
+
+(defn- fresh-store []
+  (let [st (store/mem-store)]
+    (store/register-grader! st {:grader-id "grader-1" :name "Kobo Yamada" :certified? true})
+    (store/register-facility! st {:facility-id "FAC-1" :name "Kobo Testing Lab" :max-supply-cost 2000})
+    st))
+
+(deftest commits-a-registered-sample-log
+  (let [st (fresh-store)
+        graph (actor/build-graph {:store st})
+        request {:grader-id "grader-1" :op :log-sample-record :stake :low
+                  :facility-id "FAC-1" :item "batch 44 lot A intake"}
+        result (actor/run-request! graph request {} "thread-1")]
+    (is (= :done (:status result)))
+    (is (some? (get-in result [:state :record])))
+    (is (= 1 (count (store/records-of st "grader-1"))))))
+
+(deftest holds-an-unregistered-facility-proposal
+  (let [st (fresh-store)
+        graph (actor/build-graph {:store st})
+        request {:grader-id "grader-1" :op :log-sample-record :stake :low
+                  :facility-id "FAC-ghost" :item "batch 44 lot A intake"}
+        result (actor/run-request! graph request {} "thread-2")]
+    (is (= :hold (:disposition (:state result))))
+    (is (empty? (store/records-of st "grader-1")))))
+
+(deftest interrupts-then-approves-anomaly-concern-on-human-approval
+  (let [st (fresh-store)
+        graph (actor/build-graph {:store st})
+        request {:grader-id "grader-1" :op :flag-anomaly-concern :stake :low
+                  :facility-id "FAC-1" :anomaly-type :out-of-tolerance-reading}
+        interrupted (actor/run-request! graph request {} "thread-3")]
+    (is (= :interrupted (:status interrupted)))
+    (is (empty? (store/records-of st "grader-1")))
+    (let [resumed (actor/approve! graph "thread-3")]
+      (is (= :done (:status resumed)))
+      (is (= 1 (count (store/records-of st "grader-1")))))))
+
+(deftest holds-a-scope-excluded-op-even-at-high-confidence
+  (testing "an actor run can never commit a proposal that would assign a quality grade, regardless of disposition path"
+    (let [st (fresh-store)
+          graph (actor/build-graph {:store st})
+          request {:grader-id "grader-1" :op :assign-quality-grade :stake :low
+                    :facility-id "FAC-1" :item "quality grade assignment"}
+          result (actor/run-request! graph request {} "thread-4")]
+      (is (= :done (:status result)))
+      (is (= :hold (:disposition (:state result))))
+      (is (empty? (store/records-of st "grader-1"))))))
+
+(deftest holds-a-pass-fail-determination-op-even-at-high-confidence
+  (testing "an actor run can never commit a proposal that would determine a pass/fail outcome, regardless of disposition path"
+    (let [st (fresh-store)
+          graph (actor/build-graph {:store st})
+          request {:grader-id "grader-1" :op :determine-pass-fail-outcome :stake :low
+                    :facility-id "FAC-1" :item "pass/fail determination"}
+          result (actor/run-request! graph request {} "thread-5")]
+      (is (= :done (:status result)))
+      (is (= :hold (:disposition (:state result))))
+      (is (empty? (store/records-of st "grader-1"))))))
+
+(deftest holds-a-quality-clearance-op-even-at-high-confidence
+  (testing "an actor run can never commit a proposal that would finalize a quality clearance, regardless of disposition path"
+    (let [st (fresh-store)
+          graph (actor/build-graph {:store st})
+          request {:grader-id "grader-1" :op :finalize-quality-clearance :stake :low
+                    :facility-id "FAC-1" :item "quality clearance decision"}
+          result (actor/run-request! graph request {} "thread-6")]
+      (is (= :done (:status result)))
+      (is (= :hold (:disposition (:state result))))
+      (is (empty? (store/records-of st "grader-1"))))))
+
+(deftest holds-a-perform-quality-evaluation-op-even-at-high-confidence
+  (testing "an actor run can never commit a proposal that would perform the grading/testing evaluation itself"
+    (let [st (fresh-store)
+          graph (actor/build-graph {:store st})
+          request {:grader-id "grader-1" :op :perform-quality-evaluation :stake :low
+                    :facility-id "FAC-1" :item "quality evaluation"}
+          result (actor/run-request! graph request {} "thread-7")]
+      (is (= :done (:status result)))
+      (is (= :hold (:disposition (:state result))))
+      (is (empty? (store/records-of st "grader-1"))))))
