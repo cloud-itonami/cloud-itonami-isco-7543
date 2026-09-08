@@ -68,7 +68,7 @@
                                 grader/tester, never auto-commits).
     7. :op :coordinate-supply-order above `supply-cost-threshold`.
     8. low confidence (< `confidence-floor`)."
-  (:require [clojure.string :as str]
+  (:require [kotoba.lang.text :as str]
             [prodgrade.store :as store]))
 
 (def confidence-floor 0.6)
@@ -122,7 +122,7 @@
    "authorize the quality-clearance"])
 
 (defn- contains-excluded-phrase? [s]
-  (let [s (str/lower-case (or s ""))]
+  (let [s (str/lower (or s ""))]
     (boolean (some #(str/includes? s %) scope-excluded-phrases))))
 
 (defn- hard-violations [proposal grader-record facility-record]
