@@ -90,7 +90,7 @@ tasting-session) to non-food product grading/testing (sample-intake,
 testing-session)).
 
 ```bash
-clojure -M:test   # full suite, green
+kbb -M:test   # full suite, green
 ```
 
 This is what backs this repo's `:maturity :implemented` entry in
