@@ -1,5 +1,5 @@
 (ns prodgrade.actor-test
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [kotoba.test :refer [deftest is testing]]
             [prodgrade.actor :as actor]
             [prodgrade.store :as store]))
 
