@@ -1,0 +1,34 @@
+;; What this vertical's robot physically does, declared for
+;; kotoba.robotics.process (kotoba-lang/robotics). `kbb -M:physics` runs it.
+;;
+;; README "Robotics premise": a sample-intake-logging and session-scheduling
+;; coordination robot logs sample intake/batch identifiers, schedules testing
+;; sessions and coordinates testing supplies; it never grades or tests. Its
+;; physical work is sample handling before the test: carrying sample totes
+;; from goods-in to the test lab, and placing samples in the conditioning rack.
+;;
+;; Every number without a cited source is marked `estimate` in its :basis.
+;; Replacing an estimate with a sourced value is this bot's growth work.
+{:physics/schema "itonami.physical-ai.spec.v1"
+ :repo "cloud-itonami/cloud-itonami-isco-7543"
+ :cases
+ [{:id :sample-tote-to-lab
+   :kind :transport
+   :procedure "intake AMR carries a stack of sample totes from goods-in to the test lab"
+   :params {:mass-kg 50.0 :distance-m 80.0 :v-max-mps 1.2 :a-max-mps2 0.5
+            :brake-decel-mps2 1.0 :drive-force-n 100.0 :crr 0.02
+            :cog-height-m 0.35 :payload-cog-height-m 0.70 :support-half-length-m 0.30
+            :max-time-s 1200.0}
+   :sweep {:param :payload-kg :values [10.0 30.0 60.0 100.0 150.0]}
+   :quantity :cycle-time-s
+   :limit {:max 90.0 :basis "estimate: a sample leg within the 90 s slot the session schedule allows between intakes"}
+   :boundary {:lo 5.0 :hi 400.0}}
+  {:id :sample-into-conditioning-rack
+   :kind :manipulator
+   :procedure "arm moves a sample from the tote into a slot of the conditioning rack"
+   :params {:l1-m 0.45 :l2-m 0.40 :m1-kg 3.5 :m2-kg 2.5
+            :from [0.55 0.00] :to [0.25 0.60] :duration-s 1.5 :steps 400}
+   :sweep {:param :payload-kg :values [0.5 1.0 2.0 4.0 6.0]}
+   :quantity :peak-tau1-nm
+   :limit {:max 50.0 :basis "estimate: continuous shoulder torque of a ~5 kg-class collaborative arm"}
+   :boundary {:lo 0.1 :hi 30.0}}]}
