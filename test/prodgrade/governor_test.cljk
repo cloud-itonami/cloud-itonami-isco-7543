@@ -1,5 +1,5 @@
 (ns prodgrade.governor-test
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [kotoba.test :refer [deftest is testing]]
             [prodgrade.store :as store]
             [prodgrade.advisor :as advisor]
             [prodgrade.governor :as governor]))
