@@ -2,7 +2,7 @@
   "SSoT for the ISCO-08 7543 Product Graders and Testers (excluding
   Foods and Beverages) sample-intake-logging/session-scheduling
   coordination actor (itonami actor pattern, ADR-2607121000 /
-  CLAUDE.md Actors section; README's 'Robotics premise' — a
+  AGENTS.md Actors section; README's 'Robotics premise' — a
   sample-intake-logging/scheduling coordination robot performs sample
   intake/batch-identifier metadata logging, testing-session scheduling
   and testing-supply coordination for a human grader/tester crew under
