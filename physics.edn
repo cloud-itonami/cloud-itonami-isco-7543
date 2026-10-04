@@ -30,5 +30,6 @@
             :from [0.55 0.00] :to [0.25 0.60] :duration-s 1.5 :steps 400}
    :sweep {:param :payload-kg :values [0.5 1.0 2.0 4.0 6.0]}
    :quantity :peak-tau1-nm
-   :limit {:max 50.0 :basis "estimate: continuous shoulder torque of a ~5 kg-class collaborative arm"}
+   :limit {:max 150.0
+           :basis "UR5e shoulder joint (J1) max joint torque 150 N\u00b7m (joint Size 3) \u2014 Universal Robots, 'Max. joint torques CB3 and e-Series', https://www.universal-robots.com/articles/ur/robot-care-maintenance/max-joint-torques-cb3-and-e-series/" }
    :boundary {:lo 0.1 :hi 30.0}}]}
